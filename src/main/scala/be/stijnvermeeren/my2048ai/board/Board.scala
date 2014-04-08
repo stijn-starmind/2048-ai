@@ -21,7 +21,13 @@ case class Board(width: Int, height: Int, cells: CellMap) {
 
   def move(move: Move): (Board, Int) = move(this)
 
-  def emptyCoords: List[(Int, Int)] = cells.filter(_._2 == EmptyCell).keys.toList
+  lazy val emptyCoords: List[(Int, Int)] = cells.filter(_._2 == EmptyCell).keys.toList
+
+  lazy val maxValue: Int = {
+    cells.values.collect {
+      case ValueCell(value) => value
+    }.max
+  }
 
   def rows: List[Line] = {
     {

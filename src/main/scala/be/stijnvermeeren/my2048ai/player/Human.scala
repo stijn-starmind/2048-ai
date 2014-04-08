@@ -7,7 +7,7 @@ import scala.annotation.tailrec
 case class Human() extends Player {
   @tailrec
   final def decide(board: Board): InGameMove = {
-    println("Decide move (1=left, 2=down, 3=right, 5=up, q=quit, u=undo):")
+    tell("Decide move (1=left, 2=down, 3=right, 5=up, q=quit, u=undo):")
     Console.in.readLine() match {
       case "1" => check(board, Left)
       case "2" => check(board, Down)
@@ -16,7 +16,7 @@ case class Human() extends Player {
       case "q" => Quit
       case "u" => Undo
       case input =>
-        println(s"Unknown move $input, please try again.")
+        tell(s"Unknown move $input, please try again.")
         decide(board)
     }
   }
@@ -28,5 +28,10 @@ case class Human() extends Player {
       println(s"Illegal move $move, please try again.")
       decide(board)
     }
+  }
+
+  override def tell(message: String): Unit = {
+    println()
+    println(message)
   }
 }

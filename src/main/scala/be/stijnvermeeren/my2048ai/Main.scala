@@ -1,30 +1,30 @@
 package be.stijnvermeeren.my2048ai
 
-import scala.annotation.tailrec
-
-import be.stijnvermeeren.my2048ai.game.Game
-import be.stijnvermeeren.my2048ai.move.{Move, Quit, Undo}
-import be.stijnvermeeren.my2048ai.player.{Human, Player}
+import be.stijnvermeeren.my2048ai.player.{Random, MovePriority, Player, Human}
 
 object Main extends App {
-  val game = Game.start()
-  val player = Human()
-  play(game, player)
+  val player = Random()
+  benchmark(player)
 
-  @tailrec
-  def play(game: Game, player: Player): Unit = {
-    println()
-    println(game.state)
-    println()
+  def singleGame(player: Player): GameResult = {
+    val result = new GameResult(player)
+    result.log()
+    result
+  }
 
-    if (! game.state.gameOver) {
-      player.decide(game.state.board) match {
-        case move: Move => play(game.move(move), player)
-        case Quit => println("You quitter!")
-        case Undo => ???
-      }
-    } else {
-      println("GAME OVER")
+  def benchmark(player: Player, tries: Int = 100): Unit = {
+    val data = for (i <- 0 until tries) yield {
+      val result = new GameResult(player)
+      result.log()
+      (result.score, result.maxValue)
     }
+    val (scores, maxValues) = data.unzip
+
+    println(s"Tries: $tries")
+    println(s"Top score: ${scores.max}")
+    println(f"Average score: ${scores.sum.toDouble / tries}")
+    println(s"Top max value: ${maxValues.max}")
+    val frequencies = maxValues.groupBy(value => value).mapValues(_.size.toDouble / tries).toList.sortBy(_._1).reverse
+    println(s"Max value frequencies: $frequencies")
   }
 }
